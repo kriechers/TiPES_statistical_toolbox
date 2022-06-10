@@ -1,0 +1,1 @@
+data downloaded from http://www.iceandclimate.nbi.ku.dk/data/NGRIP_d18O_and_dust_5cm.xls on 2022/06/08
