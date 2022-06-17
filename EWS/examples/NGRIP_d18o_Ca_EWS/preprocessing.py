@@ -94,7 +94,7 @@ def binning(t_ax, data, bins=None):
     return binned_t_ax, np.array(binned_data)
 
 
-def NGRIP_stadial_mask(age):
+def NGRIP_stadial_mask(age, Boers = True):
     '''
     this function takes an age axis as an input, that is compatibles 
     with the NGRIP GICC05modelext chronology in terms of covered time. 
@@ -126,6 +126,13 @@ def NGRIP_stadial_mask(age):
     transitions = np.append(np.array(stadials[:-1]) != np.array(stadials[1:]),
                             False)
     transition_ages = stratigraphic['age'][transitions].values
+    if Boers:
+        transition_ages = np.sort(pd.read_table('original_data/Boers_transitions.txt', sep = '\t', header = 0).values.flatten())
+        transition_ages[0] = 11703
+    
+    transition_names = stratigraphic['event'][transitions].values
+    for i,name in enumerate(transition_names):
+        transition_names[i] = name.split()[-1]
 
     max_age = np.max(age)
     min_age = np.min(age)
@@ -133,12 +140,18 @@ def NGRIP_stadial_mask(age):
     start_idx = 0
     while transition_ages[start_idx] < min_age:
         start_idx += 1
+    # while stratigraphic['age'][start_idx] < min_age:
+    #         start_idx += 1
+            
+    # end_idx = len(transitions)-1
+    # while stratigraphic['age'][end_idx] > max_age:
+    #     end_idx -= 1
 
     end_idx = len(transition_ages)-1
     while transition_ages[end_idx] > max_age:
         end_idx -= 1
 
-    if stadials[start_idx]:
+    if stadials[stratigraphic['age'] == transition_ages[start_idx]]:
         GS = age < transition_ages[start_idx]
 
         for i in range(start_idx + 1, end_idx, 2):
@@ -152,4 +165,19 @@ def NGRIP_stadial_mask(age):
                        & (age < transition_ages[i+1]))
             GS = GS | GS_mask
 
-    return GS, transition_ages[start_idx: end_idx+1]
+        if i == end_idx - 2:
+            GS_mask = ((transition_ages[end_idx] < age)
+                       & (age <= max_age))
+            GS = GS | GS_mask
+
+    return GS, transition_ages[start_idx: end_idx+1], transition_names[start_idx: end_idx+1]
+
+
+# check
+
+# fig, ax = plt.subplots()
+# ax.plot(d18o_time[GS[::-1]], d18o[::-1][GS[::-1]], lw = 0.5)
+# ax.plot(d18o_time[~GS[::-1]], d18o[::-1][~GS[::-1]], color = 'C1',
+#         lw = 0.5)
+# for t in transition_ages:
+#     ax.axvline(-t)
