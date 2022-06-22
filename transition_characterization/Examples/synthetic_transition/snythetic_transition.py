@@ -1,11 +1,28 @@
-from transition_characterization import estimate_transition, combined_transition
-from distributions import sample_ar1
-from model import linear_ramp, fit_rmse
 import numpy as np
 import matplotlib.pyplot as plt
 import joblib as jl
 import sys
+import statsmodels.api as sm
 sys.path.append('../../')
+from model import linear_ramp, fit_rmse
+from distributions import sample_ar1
+from transition_characterization import estimate_transition, combined_transition
+
+
+#################################################################
+# test the GLSAR from stats                                     #
+#################################################################
+
+delta = 0.1
+time = np.arange(-100, 100, delta)
+xx = sample_ar1(len(time), 0.3, sigma=0.3, x0=0)
+dx = np.diff(xx)
+xx = sm.add_constant(xx)
+model = sm.GLSAR(dx, xx[:-1], rho=1)
+results = model.iterative_fit(maxiter=10)
+
+a = results.params[1]
+
 
 #################################################################
 # create synthetic transition                                   #
@@ -37,13 +54,13 @@ tax.set_xlim(ax.get_xlim())
 tax.set_xticks([popt[0], popt[0] + np.exp(popt[1])])
 tax.set_xticklabels(['$t_0 = %0.2f$' % popt[0],
                      '$t_0 = %0.2f$' % (popt[1] + np.exp(popt[1]))],
-                    rotation = 45,
-                    ha = 'left',
-                    rotation_mode = 'anchor')
+                    rotation=45,
+                    ha='left',
+                    rotation_mode='anchor')
 
 ax.set_xlabel('time')
 ax.set_ylabel('$x$')
-fig.subplots_adjust(top = 0.8)
+fig.subplots_adjust(top=0.8)
 ax.legend()
 
 
@@ -86,19 +103,22 @@ ax2.spines['top'].set_visible(False)
 ax2.patch.set_visible(False)
 
 
-ax1.plot(time, synt_trans, color='C0', label='synthetic transition', lw = 0.5)
-ax1.plot(time, p50, color='k', lw = 1.2, label = '50th percentile', zorder = 12)
-ax1.plot(time, p5, color='slategray', lw = 0.8)
-ax1.plot(time, p95, color='slategray',  lw = 0.8)
-ax1.fill_between(time, p5, p95, color='C1', alpha=.8, zorder = 10, label = '90th percentile range')
+ax1.plot(time, synt_trans, color='C0', label='synthetic transition', lw=0.5)
+ax1.plot(time, p50, color='k', lw=1.2, label='50th percentile', zorder=12)
+ax1.plot(time, p5, color='slategray', lw=0.8)
+ax1.plot(time, p95, color='slategray',  lw=0.8)
+ax1.fill_between(time, p5, p95, color='C1', alpha=.8,
+                 zorder=10, label='90th percentile range')
 ax1.set_ylabel('$x$')
 ax1.legend()
 
 hist_ax = t0_dist[1][:-1] + (t0_dist[1][1] - t0_dist[1][0])/2
 mask0 = t0_dist[0] > 0.001
 mask1 = t1_dist[0] > 0.001
-ax2.fill_between(hist_ax[mask0], t0_dist[0][mask0], color='C4', lw=1, label='$t_0$')
-ax2.fill_between(hist_ax[mask1], t1_dist[0][mask1], color='C6', lw=1, label='$t_1$')
+ax2.fill_between(hist_ax[mask0], t0_dist[0][mask0],
+                 color='C4', lw=1, label='$t_0$')
+ax2.fill_between(hist_ax[mask1], t1_dist[0][mask1],
+                 color='C6', lw=1, label='$t_1$')
 ax2.set_xlabel('time')
 ax2.set_ylabel('rel. probability')
 ax2.yaxis.set_ticks_position('right')

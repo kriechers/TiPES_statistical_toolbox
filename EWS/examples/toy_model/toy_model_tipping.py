@@ -83,7 +83,7 @@ alpha_crit2 = np.max(val[counts == 3])
 # create time series with bifurcation induced tipping           #
 #################################################################
 
-t_f = 300
+t_f = 600
 t_1 = t_f /4
 t_2 = 3 * t_f/4
 time = np.arange(0, t_f, dt)
