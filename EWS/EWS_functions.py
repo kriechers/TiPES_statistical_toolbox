@@ -380,3 +380,70 @@ def run_fit_a_ar1(x, w):
         xs[i] = np.log(a + 1)
         # if a+1 
     return xs
+
+
+def ln_AR1_likelihood(obs, alpha, sigma):
+    alpha = alpha[None,:,:]
+    sigma = sigma[None,:,:]
+    res = (obs[1:][:,None,None]
+           - alpha * obs[:-1][:,None,None])
+
+    k = 2 * np.pi * sigma **2
+
+    lnp = -0.5 * np.sum(np.log(k) + (res / sigma) **2,
+                        axis = 0 )
+    return lnp
+
+
+def bayesian_AR1(xx, yy, rw, res = 1):
+    '''
+    model: x[i+1] = alpha * x[i] + sigma * epsilon[i]
+    '''
+    yy = yy - np.mean(yy)
+    dt = xx[1] - xx[0]
+    n = len(xx)
+    rw_idx = np.arange(0, rw)
+    step_idx = np.arange(0, n-rw, res)
+    m = len(step_idx)
+    nx_ax = xx[step_idx + int(rw/2)]
+
+    dalpha = 1e-3
+    alpha_ax = np.arange(0,1,dalpha)
+    
+    # the variance of an AR1 process is given by
+    # var(X) = sigma^2 / (1-alpha^2) and hence
+    # sigma^2 < var(X), => we use 1.2 sqrt(var(X))
+    # as an upper bound on sigma
+    sigma_ax = np.linspace(0.001,1.2 * np.std(yy), 1000)
+    dsigma = sigma_ax[1] - sigma_ax[0]
+
+    alpha_est = np.zeros((m, len(alpha_ax)))
+    sigma_est = np.zeros((m, len(sigma_ax)))
+    
+    for i,j in enumerate(step_idx):
+        print(j)
+        data = yy[j:j+rw]
+        alpha_grid, sigma_grid = np.meshgrid(alpha_ax, sigma_ax)
+        posterior = np.exp(ln_AR1_likelihood(data, alpha_grid, sigma_grid))
+        marginal_alpha = np.sum(posterior, axis = 0) * dsigma
+        norm_alpha = np.sum(marginal_alpha) * dalpha
+        marginal_alpha = marginal_alpha / norm_alpha
+        
+        marginal_sigma = np.sum(posterior, axis = 1) * dalpha
+        norm_sigma = np.sum(marginal_sigma) * dsigma
+        marginal_sigma = marginal_sigma / norm_sigma
+
+        alpha_est[i] = marginal_alpha
+        sigma_est[i] = marginal_sigma
+
+    return nx_ax, marginal_alpha, marginal_sigma
+        
+        
+        
+
+        
+
+
+        
+        
+        

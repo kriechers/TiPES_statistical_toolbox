@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 from scipy.optimize import fsolve
 import sys
 sys.path.append('../../')
-from EWS_functions import EWS
+from EWS_functions import EWS, bayesian_AR1
 
 def make_patch_spines_invisible(ax):
     ax.set_frame_on(True)
@@ -206,3 +206,4 @@ axbg.axvline(t_crit, lw = 0.2, color ='k')
 axbg.yaxis.set_visible(False)
 
 
+marginal_alpha, marginal_sigma = bayesian_AR1(time[mask], xx[mask], int(rw / dt), res = 10)

@@ -1,4 +1,13 @@
-"""Distribution and likelyhood functions """
+"""
+All code in this file was published in conjunction with the
+research article Erhardt, T. et al. Decadal-scale progression of
+the onset of Dansgaard-Oeschger warming events. Clim. Past 15,
+811–825 (2019) and is available from 
+https://github.com/terhardt/DO-progression (last access: 28.06.22)
+------------------------------------------------------------------
+
+Distribution and likelyhood functions """
+
 import numpy as np
 from scipy.special import gammaln
 

@@ -10,18 +10,18 @@ from transition_characterization import estimate_transition, combined_transition
 
 
 #################################################################
-# test the GLSAR from stats                                     #
+# test the GLSAR from stats - to be removed from this file      #
 #################################################################
 
-delta = 0.1
-time = np.arange(-100, 100, delta)
-xx = sample_ar1(len(time), 0.3, sigma=0.3, x0=0)
-dx = np.diff(xx)
-xx = sm.add_constant(xx)
-model = sm.GLSAR(dx, xx[:-1], rho=1)
-results = model.iterative_fit(maxiter=10)
+# delta = 0.1
+# time = np.arange(-100, 100, delta)
+# xx = sample_ar1(len(time), 0.3, sigma=0.3, x0=0)
+# dx = np.diff(xx)
+# xx = sm.add_constant(xx)
+# model = sm.GLSAR(dx, xx[:-1], rho=1)
+# results = model.iterative_fit(maxiter=10)
 
-a = results.params[1]
+# a = results.params[1]
 
 
 #################################################################
@@ -70,16 +70,15 @@ ax.legend()
 
 traces = estimate_transition(time,
                              synt_trans,
-                             yres=0.1,
                              nwalkers=20, nsamples=600, nthin=1)
 
-t0_dist = np.histogram(traces[0], time, density=True)
-t1_dist = np.histogram(traces[1], time, density=True)
+t0_dist = np.histogram(traces['t0'], time, density=True)
+t1_dist = np.histogram(traces['t0'] + traces['dt'], time, density=True)
 
 # make an axis for the distributions of y0 and dy
 y_ax = np.linspace(np.min(synt_trans), np.max(synt_trans), 1000)
-y0_dist = np.histogram(traces[2], y_ax, density=True)
-dy_dist = np.histogram(traces[3], y_ax, density=True)
+y0_dist = np.histogram(traces['y0'], y_ax, density=True)
+dy_dist = np.histogram(traces['dy'], y_ax, density=True)
 
 
 p5, p50, p95 = combined_transition(time, traces)

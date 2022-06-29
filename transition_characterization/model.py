@@ -1,7 +1,16 @@
-"""Model and fitting related functions
+"""
+All code in this file was published in conjunction with the
+research article Erhardt, T. et al. Decadal-scale progression of
+the onset of Dansgaard-Oeschger warming events. Clim. Past 15,
+811–825 (2019) and is available from 
+https://github.com/terhardt/DO-progression (last access: 28.06.22)
+------------------------------------------------------------------
+
+Model and fitting related functions
 
 This file contains all the functions related to the deterministic model
 the probabilistic model and the fitting of the model to data
+
 """
 import numpy as np
 import emcee
