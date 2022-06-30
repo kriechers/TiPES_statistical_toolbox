@@ -163,8 +163,7 @@ def estimate_transition(time,
                         ptrans=None,
                         pnoise=None,
                         nwalkers=60, nsamples=60000, nthin=600):
-    '''
-    create an MCMC sample from the posterior probability joint  
+    '''create an MCMC sample from the posterior probability joint  
     distribution of the model paramters. noise paramters are 
     omitted in the output. 
 
@@ -186,9 +185,22 @@ def estimate_transition(time,
              survive. 
 
     output
-    ------
+    ------ 
 
-    
+    out [pandas DataFrame] := the output pandas DataFrame 
+    comprises 4 columns ['t0', 'dt', 'y0', 'dy'] each of which 
+    represent one of the transition parameters. Each row of the 
+    DataFrame contains one sample from the joint posterior 
+    distribution of the six model paramters, where 'tau' and 
+    'sigma' are omitted. There are in total 
+
+    ntotal = nwalkers * nsamples / nthin 
+
+    rows / samples comprised in the output. 
+
+    Caution: with the default settings, the MCMC sampler may take 
+    up an hour to run on a personal computer. 
+
     '''
 
     if ptrans is None:
