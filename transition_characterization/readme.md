@@ -62,9 +62,11 @@ process that fluctuates around a time dependent mean value. The
 time dependency of the mean is modelled as a piecewise linear
 ramp of the form:
 
-          y0                      if t_i<t0
-y(t_i) =  dy (t_i-t0) / dt + y0   if t0<t_i<t0+dt
-          y0 + dy                 if t_i>t0+dt
+y(t_i) =  y0 if t_i<t0
+
+y(t_i) =  dy (t_i-t0) / dt + y0 if t0<t_i<t0+dt
+
+y(t_i) =  y0 + dy if t_i>t0+dt
 
 The fluctuations around that mean values are mathematically 
 described as an AR1 process: 
