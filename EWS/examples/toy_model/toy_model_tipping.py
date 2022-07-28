@@ -205,5 +205,11 @@ for i, (ax, data) in enumerate(zip([ax2, ax3, ax4], [rv, rac, rrf])):
 axbg.axvline(t_crit, lw = 0.2, color ='k')
 axbg.yaxis.set_visible(False)
 
+#################################################################
+# BAYESIAN FIT OF AN AR1 PROCESS                                #
+#################################################################
 
-marginal_alpha, marginal_sigma = bayesian_AR1(time[mask], xx[mask], int(rw / dt), res = 10)
+# marginal_alpha, marginal_sigma = bayesian_AR1(time[mask], xx[mask], int(rw / dt), res = 10)
+
+# fig, ax = plt.subplots()
+# ax.contour(marginal_alpha)

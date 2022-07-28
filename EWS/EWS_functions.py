@@ -395,7 +395,7 @@ def ln_AR1_likelihood(obs, alpha, sigma):
     return lnp
 
 
-def bayesian_AR1(xx, yy, rw, res = 1):
+def bayesian_AR1(xx, yy, rw, res = 1, alpha_ax = None, sigma_ax = None):
     '''
     model: x[i+1] = alpha * x[i] + sigma * epsilon[i]
     '''
@@ -407,15 +407,17 @@ def bayesian_AR1(xx, yy, rw, res = 1):
     m = len(step_idx)
     nx_ax = xx[step_idx + int(rw/2)]
 
-    dalpha = 1e-3
-    alpha_ax = np.arange(0,1,dalpha)
+    if alpha_ax == None:
+        dalpha = 1e-3
+        alpha_ax = np.arange(0,1,dalpha)
     
     # the variance of an AR1 process is given by
     # var(X) = sigma^2 / (1-alpha^2) and hence
     # sigma^2 < var(X), => we use 1.2 sqrt(var(X))
     # as an upper bound on sigma
-    sigma_ax = np.linspace(0.001,1.2 * np.std(yy), 1000)
-    dsigma = sigma_ax[1] - sigma_ax[0]
+    if sigma_ax == None:
+        sigma_ax = np.linspace(0.001,1.2 * np.std(yy), 1000)
+        dsigma = sigma_ax[1] - sigma_ax[0]
 
     alpha_est = np.zeros((m, len(alpha_ax)))
     sigma_est = np.zeros((m, len(sigma_ax)))
