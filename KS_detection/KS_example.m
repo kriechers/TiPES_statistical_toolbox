@@ -4,7 +4,8 @@
 % as the glacial/interglacial boundaries. The results are plotted and saved
 % as a pdf file.
 %
-% Author: Witold Bagniewski Date: 31/07/2022
+% Author: Witold Bagniewski
+% Date: 31/07/2022
 %
 %% Load data
 Fname = 'ngrip_d18o_20y';  ext = '.txt'; 
