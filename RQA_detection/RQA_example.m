@@ -8,7 +8,8 @@
 % abrupt transitions in paleoclimate records. Chaos, 31(11):113129,
 % https://doi.org/10.1063/5.0062543
 %
-% Author: Witold Bagniewski Date: 31/07/2022
+% Author: Witold Bagniewski
+% Date: 31/07/2022
 %
 %% Load data
 Fname = 'ngrip_d18o_20y';  ext = '.txt'; 
