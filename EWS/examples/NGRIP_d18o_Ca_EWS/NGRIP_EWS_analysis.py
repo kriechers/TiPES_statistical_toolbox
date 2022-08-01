@@ -2,6 +2,8 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 from matplotlib.patches import ConnectionPatch
+from scipy.signal import filtfilt, cheby1, lombscargle
+from scipy.interpolate import interp1d, UnivariateSpline
 import sys
 sys.path.append('../../')
 from preprocessing import download, binning, NGRIP_stadial_mask
@@ -26,8 +28,6 @@ def vmarker(x0, x1, ax0, ax1, **kwargs):
     ax0.add_artist(con)
 
 
-
-
 data = download()
 
 d18o_idx = data['d18o'].dropna().index.values
@@ -38,20 +38,203 @@ dust_idx = data['dust'].dropna().index.values
 dust = data['dust'].iloc[dust_idx].values
 dust_age = data['age'].iloc[dust_idx].values
 
-dt = 5
-rw = 40 # given in data points => 200y
-d18o_bins = np.arange(int(d18o_age[0]-dt/2),
-                      int(d18o_age[-1] + dt),
-                      dt)
+#----------------------------------------------------------------
+# data preprocessing according to NB
 
-d18o_age, d18o = binning(d18o_age, d18o, d18o_bins)
+def cheby_lowpass(cutoff, fs, order, rp):
+    nyq = 0.5 * fs
+    normal_cutoff = cutoff / nyq
+    b, a = cheby1(order, rp, normal_cutoff, btype='low', analog=False)
+    return b, a
 
-dust_bins = np.arange(int(dust_age[0]-dt/2),
-                      int(dust_age[-1] + dt/2),
-                      dt)
+def cheby_lowpass_filter(x, cutoff, fs, order, rp):
+    b, a = cheby_lowpass(cutoff, fs, order, rp)
+    y = filtfilt(b, a, x)
+    return y
 
-dust_age, dust = binning(dust_age, dust, dust_bins)
+def cheby_highpass(cutoff, fs, order, rp):
+    nyq = 0.5 * fs
+    normal_cutoff = cutoff / nyq
+    b, a = cheby1(order, rp, normal_cutoff, btype='high', analog=False)
+    return b, a
 
+def cheby_highpass_filter(x, cutoff, fs, order, rp):
+    b, a = cheby_highpass(cutoff, fs, order, rp)
+    y = filtfilt(b, a, x)
+    return y
+
+# set parameters for chebychef filter:
+order = 8
+# the maximum ripple allowed below unity gain in the passband (in dB)
+rp = .05
+# sampling frequency, should be equal to 1 because we have 1-yr steps?
+fss = 1.
+# the sampling width to which we want to interpolate the data
+samp = 5
+# MTM time half-bandwidth
+NW = 4
+
+sec_factor = .95
+sw = 100
+
+print("samp: ", samp)
+# the corresponding cutoff frequency
+cutoff = .5 * 1. / samp
+# offset at beginning and end:
+offset = 19
+
+int_method = 'cubic'
+print(int_method)
+
+prox = 'd18o'
+
+data_file = 'original_data/icecore/NGRIP_d18O_and_dust_5cm/NGRIP_d18O_and_dust_5cm.xls'
+colnames = ['depth', 'd18o', 'dust', 'age', 'age_err']
+
+age_int = np.array(d18o_age, dtype = 'int')
+end_age = 10277
+start = np.argmin(np.abs(d18o_age - end_age))
+end = -1
+age = d18o_age[start : end]
+age_int = age_int[start : end]
+age_ipd = np.arange(age_int.min(), age_int.max())
+# age_ipd = np.arange(age_int.min() + 5, age_int.max())
+print(age_ipd)
+#d18o = ngrip[:, 2][start : end]
+#dust = ngrip[:, 3][start : end]
+d18o = d18o[start : end]
+
+
+raw_samp = np.diff(age)
+print("sampling steps > 5yr: ", np.where(raw_samp > 5)[0].shape[0] / float(raw_samp.shape[0]))
+print("sampling steps > 4yr: ", np.where(raw_samp > 4)[0].shape[0] / float(raw_samp.shape[0]))
+bins = np.linspace(raw_samp.min(), raw_samp.max(), 20)
+rs_hist = np.histogram(raw_samp, bins = bins, density = True)
+print(rs_hist)
+
+
+time = np.arange(age.min(), age.max(), samp)[::-1]
+
+if prox == 'dust':
+    dust = -np.log(dust)
+    nan_idx = np.where(np.isnan(dust) == True)[0]
+    dust_filled = dust.copy()
+    for i in nan_idx:
+        swwi = np.min((i, sw))
+        swwe = np.min((age.shape[0] - i, sw))
+        nonan_idx_temp = np.where(np.isnan(dust[i - swwi : i + swwe]) == False)[0]
+        nan_idx_temp = np.where(np.isnan(dust[i - swwi : i + swwe]) == True)[0]
+        jdat_temp = np.zeros((2, nonan_idx_temp.shape[0]))
+        jdat_temp[0] = d18o[i - swwi : i + swwe][nonan_idx_temp]
+        jdat_temp[1] = dust[i - swwi : i + swwe][nonan_idx_temp]
+        kernel_temp = st.gaussian_kde(jdat_temp)
+        x_temp = d18o[i]
+        y_temp = np.linspace(dust[i - swwi : i + swwe][nonan_idx_temp].min(), dust[i - swwi : i + swwe][nonan_idx_temp].max(), 101)
+        xx_temp, yy_temp = np.meshgrid(x_temp, y_temp)
+        positions_temp = np.vstack([xx_temp.ravel(), yy_temp.ravel()])
+        f_temp = np.reshape(kernel_temp(positions_temp).T, xx_temp.shape)
+        dust_filled[i] = y_temp[np.argmax(f_temp, axis = 0)]
+
+
+
+if int_method == 'cheby':
+    dat = np.loadtxt('data/NGRIP_d18O_samp%d_Cheby1_iter_interpolated_order%d_rp%d_at.txt'%(samp, order, rp))[::-1][::samp]
+elif int_method == 'cubic':
+    # dat = np.loadtxt('data/NGRIP_d18O_samp%d_cubic_spline_interpolated_order%d_filt_at.txt'%(samp, order))[::-1][::samp]
+    # dat = np.loadtxt('data/NGRIP_d18o_samp5_cubic_spline_interpolated_end10277_sw100.txt')
+    if prox == 'd18o':
+
+        f_d18o = UnivariateSpline(age, d18o, s = 0.)
+        d18o_ipd_cub_temp = f_d18o(age_ipd)
+        d18o_ipd_cub = cheby_lowpass_filter(d18o_ipd_cub_temp, sec_factor * cutoff, fss, order, rp)
+        dat = d18o_ipd_cub[offset : -offset][::samp][::-1]
+    elif prox == 'dust':
+        f_dust = UnivariateSpline(age, dust_filled, s = 0.)
+        dust_ipd_cub_temp = f_dust(age_ipd)
+        dust_ipd_cub = cheby_lowpass_filter(dust_ipd_cub_temp, sec_factor * cutoff, fss, order, rp)
+        dat = dust_ipd_cub[offset : -offset][::samp][::-1]
+
+        f_d18o = UnivariateSpline(age, d18o, s = 0.)
+        d18o_ipd_cub_temp = f_d18o(age_ipd)
+        d18o_ipd_cub = cheby_lowpass_filter(d18o_ipd_cub_temp, sec_factor * cutoff, fss, order, rp)
+        dat2 = d18o_ipd_cub[offset : -offset][::samp][::-1]
+        print("Cor(d18o, dust) = ", np.corrcoef(dat, dat2)[0, 1])
+
+time = age_ipd[offset : -offset][::samp][::-1]
+print(time)
+print(time.shape)
+print(dat.shape)
+
+time = age_ipd[offset : -offset][::samp][::-1]
+print(time)
+print(time.shape)
+print(dat.shape)
+
+# plt.figure()
+# plt.plot(time, dat)
+# plt.show()
+
+#----------C-O-M-P-U-T-A-T-I-O-N------S-T-A-R-T-S------H-E-R-E------------------------------------------------------
+
+# normalize by standard deviation (not necessary, but makes it easier
+# to compare with plot on Interactive Wavelet page, at
+# "http://paos.colorado.edu/research/wavelets/plot/"
+
+# dat = (dat - np.mean(dat)) / np.std(dat, ddof=1)
+mdat = np.mean(dat)
+sdat = np.std(dat, ddof = 1)
+# dat = (dat - mdat)
+dat = (dat - mdat) / sdat
+
+
+
+filt = 100
+ft = 'cheby'
+stdar = 1
+
+s1 = 10
+s2 = 50
+
+scavf = 200 / samp
+
+o = 2
+psn = 2000
+
+surr_mode = 'fourier'
+
+lpf = 800
+
+offset = 200 / samp
+
+if filt > 0:
+    if ft == 'cheby':
+        filt_dat = cheby_highpass_filter(dat, .95 * 1. / filt, 1. / samp, 8, .05)
+    elif ft == 'ma':
+        filt_dat = dat - runmean(dat, filt / samp)
+
+variance = np.std(dat, ddof=1)**2
+
+d18o_age = time[::-1]
+d18o = filt_dat[::-1]
+
+
+#-----------------------------------------------------------------
+
+#------------- Data Preprocessing according to KR ---------------
+
+# dt = 5
+# rw = 40 # given in data points => 200y
+# d18o_bins = np.arange(int(d18o_age[0]-dt/2),
+#                       int(d18o_age[-1] + dt),
+#                       dt)
+
+# d18o_age, d18o = binning(d18o_age, d18o, d18o_bins)
+
+# dust_bins = np.arange(int(dust_age[0]-dt/2),
+#                       int(dust_age[-1] + dt/2),
+#                       dt)
+
+# dust_age, dust = binning(dust_age, dust, dust_bins)
 
 #################################################################
 # analysis of the d18o                                          #
