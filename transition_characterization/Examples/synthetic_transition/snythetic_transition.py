@@ -2,26 +2,10 @@ import numpy as np
 import matplotlib.pyplot as plt
 import joblib as jl
 import sys
-import statsmodels.api as sm
 sys.path.append('../../')
 from model import linear_ramp, fit_rmse
 from distributions import sample_ar1
 from transition_characterization import estimate_transition, combined_transition
-
-
-#################################################################
-# test the GLSAR from stats - to be removed from this file      #
-#################################################################
-
-# delta = 0.1
-# time = np.arange(-100, 100, delta)
-# xx = sample_ar1(len(time), 0.3, sigma=0.3, x0=0)
-# dx = np.diff(xx)
-# xx = sm.add_constant(xx)
-# model = sm.GLSAR(dx, xx[:-1], rho=1)
-# results = model.iterative_fit(maxiter=10)
-
-# a = results.params[1]
 
 
 #################################################################
@@ -53,8 +37,8 @@ tax.plot([], [])
 tax.set_xlim(ax.get_xlim())
 tax.set_xticks([popt[0], popt[0] + np.exp(popt[1])])
 tax.set_xticklabels(['$t_0 = %0.2f$' % popt[0],
-                     '$t_0 = %0.2f$' % (popt[1] + np.exp(popt[1]))],
-                    rotation=45,
+                     '$t_1 = %0.2f$' % (popt[1] + np.exp(popt[1]))],
+                    rotation=30,
                     ha='left',
                     rotation_mode='anchor')
 
@@ -62,10 +46,13 @@ ax.set_xlabel('time')
 ax.set_ylabel('$x$')
 fig.subplots_adjust(top=0.8)
 ax.legend()
+ax.set_title('least squared error fit to synthetic transition data')
+fig.savefig('least_squares_fit_synthetic_transition.pdf')
 
 
 #################################################################
 # characterize the transition with the Bayesian linear ramp fit #
+# without specification of an initial paramter guess            # 
 #################################################################
 
 traces = estimate_transition(time,
@@ -124,3 +111,6 @@ ax2.yaxis.set_ticks_position('right')
 ax2.yaxis.set_label_position('right')
 ax2.set_xlim(ax1.get_xlim())
 ax2.legend()
+ax1.set_title('Bayesian fit to synthetic transition data')
+fig.savefig('least_squares_fit_synthetic_transition.pdf')
+plt.show()

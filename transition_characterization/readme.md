@@ -1,7 +1,7 @@
 # Transition Characterization
 
 The directory *transition_characterization* is comprised of this
-readme.md, three python files and the *Eamples* directory.
+readme.md, three python files and the *Examples* directory.
 
 The three python files combine to a Bayesian ramp fit, that can
 be used to estimate the onset, duration, and amplitude of an
@@ -37,11 +37,11 @@ https://github.com/terhardt/DO-progression (last access:
     as an input and returns MCMC-sampled values from the Bayesian
     posterior distribution, which serve as an
     uncertainty-sensitive estimate of the respecitve transition
-    onset 't0', duration 'dt' and amplitude 'dy'. This function
-    uses the functions defined in the other two .py files.
-    Optionally, an initial guess for the model paramters can be
-    specified. Also, the parameters of the MCMC sampler can be
-    chosen upon a function call. 
+    onset 't0', duration 'dt', amplitude 'dy' and pre-transition
+    level 'y0'. This function uses the functions defined in the
+    other two .py files. Optionally, an initial guess for the
+    model paramters can be specified. Also, the parameters of the
+    MCMC sampler can be chosen upon a function call.
 
     The function *combined_transition* can be used to further
     assess the sampled transition parameters: it computes
@@ -56,7 +56,7 @@ https://github.com/terhardt/DO-progression (last access:
 
 ## the model 
 
-*Theory: The Bayesian ramp-fit is based on the assumption, that
+*Theory*: The Bayesian ramp-fit is based on the assumption, that
 the time-series under investigation can be modelled as an AR1
 process that fluctuates around a time dependent mean value. The
 time dependency of the mean is modelled as a piecewise linear
@@ -68,7 +68,7 @@ y(t_i) =  dy (t_i-t0) / dt + y0 if t0<t_i<t0+dt
 
 y(t_i) =  y0 + dy if t_i>t0+dt
 
-The fluctuations around that mean values are mathematically 
+The fluctuations around that mean value are mathematically 
 described as an AR1 process: 
 
 f(t_i) = alpha * f_i-1 + sqrt(sigma² * (1-alpha²)) * epsilon_i, 
@@ -90,11 +90,11 @@ and is uniquely defined by the set of 6 parameters:
 The likelihood function p(D|M) indicates the probability that a
 stochastic model prediction exactly matches the observations:
 
-ypred = yobs
+P(ypred = yobs)
 
 and is thus given by: 
 
-p(D|M) = product_i=1^N 1/sqrt(2 * pi * sigma_eff²) 
+p(D|M) = product_i=1^ N  1/sqrt(2 * pi * sigma_eff²) 
      exp(-(1/2) * (delta_i-delta_i-1 * alpha)² / sigma_eff²)
       * p(ypred_0 = yobs_0), 
 
@@ -144,3 +144,13 @@ gamma distribution weighted with a linear function
 
 ### variance sigma
 no prior defined, this is equivalent to a uniform prior. 
+
+# python requirements
+
+* python 3.8.10
+* numpy 1.17.4
+* matplotlib 3.4.2
+* joblib 1.0.1
+* pandas 1.1.5
+* emcee 3.1.2
+* scipy 1.6.3

@@ -106,4 +106,5 @@ ax2.yaxis.set_ticks_position('right')
 ax2.yaxis.set_label_position('right')
 ax2.set_xlim(ax1.get_xlim())
 ax2.legend()
-
+ax1.set_title('Bayesian fit to the onset of GI-8c')
+fig.savefig('bayesian_fit_GI8c.pdf')
