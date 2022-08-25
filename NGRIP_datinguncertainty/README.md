@@ -105,14 +105,11 @@ which determine the settings and what should be computed. Change these
 to suit your needs and then run *source(main.R)* to compute everything.
 
 The unsynchronized chronology ensemble can be obtained by
-*object![simulation](https://latex.codecogs.com/png.image?%5Cdpi%7B110%7D&space;%5Cbg_white&space;simulation "simulation")age*
-with summary statistics available from
-*object![simulation](https://latex.codecogs.com/png.image?%5Cdpi%7B110%7D&space;%5Cbg_white&space;simulation "simulation")summary*.
-The synchronized chronology ensemble will instead be stored in
-*object_sync![simulation](https://latex.codecogs.com/png.image?%5Cdpi%7B110%7D&space;%5Cbg_white&space;simulation "simulation")age*,
-with summary statistics available in
-*object_sync![simulation](https://latex.codecogs.com/png.image?%5Cdpi%7B110%7D&space;%5Cbg_white&space;simulation "simulation")summary*.
-Summaries of can be printed to screen using *summary_results(object)* or
+*object$simulation$age* with summary statistics available from
+*object$simulation$summary*. The synchronized chronology ensemble will
+instead be stored in *object_sync$simulation$age*, with summary
+statistics available in *object_sync$simulation$summary*. Summaries of
+can be printed to screen using *summary_results(object)* or
 *summary_results(object_sync)*, and key figures can be plotted using
 *plot_results(object)* or *plot_results(object_sync)*.
 

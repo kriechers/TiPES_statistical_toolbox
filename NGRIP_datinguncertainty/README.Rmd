@@ -64,7 +64,7 @@ It is possible to apply our methodology to estimate the dating uncertainty of ab
 
 For the end-user only the file *main.R* is of relevance. Of course, the user is free and encouraged to experiment and make modifications of all code in this directory. Within *main.R* there is a number of variables which determine the settings and what should be computed. Change these to suit your needs and then run *source(main.R)* to compute everything. 
 
-The unsynchronized chronology ensemble can be obtained by *object$simulation$age* with summary statistics available from *object$simulation$summary*. The synchronized chronology ensemble will instead be stored in *object_sync$simulation$age*, with summary statistics available in *object_sync$simulation$summary*. Summaries of can be printed to screen using *summary_results(object)* or *summary_results(object_sync)*, and key figures can be plotted using *plot_results(object)* or *plot_results(object_sync)*.
+The unsynchronized chronology ensemble can be obtained by *object\$simulation\$age* with summary statistics available from *object\$simulation\$summary*. The synchronized chronology ensemble will instead be stored in *object_sync\$simulation\$age*, with summary statistics available in *object_sync\$simulation\$summary*. Summaries of can be printed to screen using *summary_results(object)* or *summary_results(object_sync)*, and key figures can be plotted using *plot_results(object)* or *plot_results(object_sync)*.
 
 Summary statistics of the onset depth and onset age of the abrupt warming transitions are stored in *depthresults* and *ageresults*, respectively.
 
