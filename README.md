@@ -9,7 +9,9 @@ This toolbox aims at facilitating the investigation of past
 abrupt climate change as recorded in climate proxy data. All
 contributing authors were involved in the TiPES project and
 accordingly were involved in the assessment of paleoclimate proxy
-data with respect to abrupt shifts. 
+data with respect to abrupt shifts.
+
+-----------------------------------------------------------------
 
 ## Content
 
@@ -55,8 +57,9 @@ chronology for the NGRIP ice core. The method relies on a
 comprehensive statistical model for the respective dating
 uncertainties. 
 
+-----------------------------------------------------------
 
-### Related Publications
+## Related Publications
 
 * Comas-Bru, L., Rehfeld, K., Roesch, C., Amirnezhad-Mozhdehi, S.,
 Harrison, S. P., Atsawawaranunt, K., Ahmad, S. M., Brahim, Y. A.,
