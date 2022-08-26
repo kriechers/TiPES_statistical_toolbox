@@ -1,5 +1,4 @@
-# Statistical Toolbox for the analysis of (past) abrupt climate
-change
+# Statistical Toolbox for the analysis of (past) abrupt climate change
 
 All code comprised in this repository was developed in the
 context of the TiPES ('Tipping points in the Earth System')
@@ -59,7 +58,7 @@ uncertainties.
 
 ### Related Publications
 
-*Comas-Bru, L., Rehfeld, K., Roesch, C., Amirnezhad-Mozhdehi, S.,
+* Comas-Bru, L., Rehfeld, K., Roesch, C., Amirnezhad-Mozhdehi, S.,
 Harrison, S. P., Atsawawaranunt, K., Ahmad, S. M., Brahim, Y. A.,
 Baker, A., Bosomworth, M., Breitenbach, S. F. M., Burstyn, Y.,
 Columbu, A., Deininger, M., Demény, A., Dixon, B., Fohlmeister,
@@ -71,17 +70,17 @@ members: SISALv2: a comprehensive speleothem isotope database
 with multiple age–depth models, Earth Syst. Sci. Data, 12,
 2579–2606, https://doi.org/10.5194/essd-12-2579-2020, 2020.
 
-*Riechers, K. & Boers, N. Significance of uncertain phasing
+* Riechers, K. & Boers, N. Significance of uncertain phasing
 between the onsets of stadial-interstadial transitions in
 different Greenland ice core proxies. Clim. Past 17, 1751–1775,
 https://doi.org/10.5194/cp-17-1751-2021, 2021.
 
-*Myrvoll-Nilsen, E., Riechers, K., Rypdal, M. W. & Boers, N.
+* Myrvoll-Nilsen, E., Riechers, K., Rypdal, M. W. & Boers, N.
 Comprehensive uncertainty estimation of the timing of Greenland
 warmings in the Greenland ice core records. Clim. Past 18,
 1275–1294, https://doi.org/10.5194/cp-18-1275-2022, 2022.
 
-*Bagniewski, W., Ghil, M. & Rousseau, D. D. Automatic detection of
+* Bagniewski, W., Ghil, M. & Rousseau, D. D. Automatic detection of
 abrupt transitions in paleoclimate records. Chaos 31,
 https://doi.org/10.1063/5.0062543, 2021.
 
