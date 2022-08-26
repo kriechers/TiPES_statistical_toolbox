@@ -73,19 +73,25 @@ members: SISALv2: a comprehensive speleothem isotope database
 with multiple age–depth models, Earth Syst. Sci. Data, 12,
 2579–2606, https://doi.org/10.5194/essd-12-2579-2020, 2020.
 
-* Riechers, K. & Boers, N. Significance of uncertain phasing
+* Riechers, K. & Boers, N.: Significance of uncertain phasing
 between the onsets of stadial-interstadial transitions in
 different Greenland ice core proxies. Clim. Past 17, 1751–1775,
 https://doi.org/10.5194/cp-17-1751-2021, 2021.
 
-* Myrvoll-Nilsen, E., Riechers, K., Rypdal, M. W. & Boers, N.
+* Myrvoll-Nilsen, E., Riechers, K., Rypdal, M. W. & Boers, N.:
 Comprehensive uncertainty estimation of the timing of Greenland
 warmings in the Greenland ice core records. Clim. Past 18,
 1275–1294, https://doi.org/10.5194/cp-18-1275-2022, 2022.
 
-* Bagniewski, W., Ghil, M. & Rousseau, D. D. Automatic detection of
+* Bagniewski, W., Ghil, M. & Rousseau, D. D.: Automatic detection of
 abrupt transitions in paleoclimate records. Chaos 31,
 https://doi.org/10.1063/5.0062543, 2021.
+
+* Fohlmeister, J., Voarintsoa, N.R.G., Lechleitner, F.A., Boyd,
+  M., Brandtstätter, S., Jacobson, M.J., Oster, J.: Global
+  controls on the stable carbon isotope composition of
+  speleothems, Geochimica et Cosmochimica Acta, 279,
+  67-87, https://doi.org/10.1016/j.gca.2020.03.042, 2020.
 
 
 -----------------------------------------------------------------
