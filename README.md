@@ -88,11 +88,11 @@ abrupt transitions in paleoclimate records. Chaos 31,
 https://doi.org/10.1063/5.0062543, 2021.
 
 
+-----------------------------------------------------------------
 
+## Main Authors:
 
-
-
-
-
-
-
+* Witold Bagniewski
+* Eirik Myrvoll-Nilsen
+* Jens Fohlmeister
+* Keno Riechers
