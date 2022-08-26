@@ -157,6 +157,11 @@ Vaughn, B., Svensson, A., Vinther, B. M., and White, J. W.: The anatomy
 of past abrupt warmings recorded in Greenland ice, Nature
 Communications, 12, <https://doi.org/10.1038/s41467-021-22241-w>, 2021.
 
+Erhardt, T., Capron, E., Rasmussen, S.O., Schüpbach, S., Bigler, M.,
+Adolphi, F., and Fischer, H.: Decadal-scale progression of the onset of
+Dansgaard-Oeschger warming events, Climate of the Past, 15, 811-825,
+<https://doi.org/10.5194/cp-15-811-2019>, 2019.
+
 Gkinis, V., Simonsen, S. B., Buchardt, S. L., White, J. W., and Vinther,
 B. M.: Water isotope diffusion rates from the NorthGRIP ice core for the
 last 16,000 years - Glaciological and paleoclimatic implications, Earth
@@ -168,10 +173,10 @@ Van der Plicht, J., & Reimer, P. (2020). Testing and Improving the
 IntCal20 Calibration Curve with Independent Records. Radiocarbon, 62(4),
 1079-1094. <doi:10.1017/RDC.2020.54>
 
-Myrvoll-Nilsen, E., Riechers, K., Rypdal, M. & Boers, N. (2022).
-Comprehensive uncertainty estimation of the timing of Greenland warmings
-of the Greenland Ice core records. Climate of the Past, 18, 1275-1294.
-doi.org/10.5194/cp-18-1275-2022
+Myrvoll-Nilsen, E., Riechers, K., Rypdal, M. & Boers, N.: Comprehensive
+uncertainty estimation of the timing of Greenland warmings of the
+Greenland Ice core records. Climate of the Past, 18, 1275-1294.
+<https://doi.org/10.5194/cp-18-1275-2022>, 2022
 
 North Greenland Ice Core Project members: High-resolution record of
 Northern Hemisphere climate extending into the last interglacial period,
@@ -193,13 +198,16 @@ Ice core, Marine and TErrestrial records, COST Action ES0907), 2014.
 
 Rue, H., Martino, S., and Chopin, N.: Approximate Bayesian inference for
 latent Gaussian models using integrated nested Laplace approximations
-(with discussion)., J R Stat Soc Series B, 71, 319–392, 2009.
+(with discussion)., J R Stat Soc Series B, 71, 319–392,
+<https://doi.org/10.1111/j.1467-9868.2008.00700.x>, 2009.
 
 Rue, H., Riebler, A., Sørbye, S. H., Illian, J. B., Simpson, D. P., and
 Lindgren, F. K.: Bayesian Computing with INLA: A Review, Annu.
-Rev. Stat. Appl., 4, 395–421, 2017.
+Rev. Stat. Appl., 4, 395–421,
+<https://doi.org/10.1146/annurev-statistics-060116-054045>, 2017.
 
-Ruth, U., Wagenbach, D., Steffensen, J. P., and Bigler, M. (2003),
-Continuous record of microparticle concentration and size distribution
-in the central Greenland NGRIP ice core during the last glacial period,
-J. Geophys. Res., 108, 4098, <doi:10.1029/2002JD002376>, D3.
+Ruth, U., Wagenbach, D., Steffensen, J. P., and Bigler, M.: Continuous
+record of microparticle concentration and size distribution in the
+central Greenland NGRIP ice core during the last glacial period, J.
+Geophys. Res., 108, 4098, <a href="https://doi:10.1029/2002JD002376"
+class="uri">https://doi:10.1029/2002JD002376</a>, D3, 2003.
