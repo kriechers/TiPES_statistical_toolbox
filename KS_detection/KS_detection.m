@@ -1,4 +1,4 @@
-function [jump_u,jump_d] = KS_detection(t,x,min_w,max_w,varargin) 
+function [jumps] = KS_detection(t,x,w_min,w_max,varargin) 
 %% DESCRIPTION
 % The KS_detection function detects abrupt transitions (jumps) in climate
 % proxy records using an augmented Kolmogorov–Smirnov (KS) test. This
@@ -8,17 +8,17 @@ function [jump_u,jump_d] = KS_detection(t,x,min_w,max_w,varargin)
 % https://doi.org/10.1063/5.0062543
 %
 % Author: Witold Bagniewski
-% Date: 31/07/2022 
+% Date: 29/11/2022 
 %
 %% USAGE 
 % Syntax
-% [jump_u,jump_d] = KS_detection(t,x,min_w,max_w,n_w,d_c,n_c,s_c,x_c)
+% [jumps] = KS_detection(t,x,w_min,w_max,n_w,d_c,n_c,s_c,x_c)
 %
 % Required Inputs:
 % t     : Time. Ordered from youngest to oldest.
 % x     : Proxy value. Note: t and x must have the same length.
-% min_w : Size of the smallest window
-% max_w : Size of the largest window
+% w_min : Size of the smallest window
+% w_max : Size of the largest window
 %
 % Optional Inputs:
 % n_w   : Number of distinct window lengths
@@ -27,9 +27,8 @@ function [jump_u,jump_d] = KS_detection(t,x,min_w,max_w,varargin)
 % s_c   : Cut-off threshold s_c for the standard deviation
 % x_c   : Cut-off threshold x_c for the change in proxy value
 %
-% Outputs:
-% jump_u : Dates of jumps that go "up", e.g. abrupt warming events
-% jump_d : Dates of jumps that go "down", e.g. abrupt cooling events
+% Output:
+% jumps : Dates of jumps. Right column indicates direction: 1 = "up", -1 = "down", e.g. abrupt warming vs. abrupt cooling
 %
 %% EXAMPLE
 % % Generate some data:
@@ -41,9 +40,11 @@ function [jump_u,jump_d] = KS_detection(t,x,min_w,max_w,varargin)
 % end
 % 
 % % Find jumps:
-% [jump_ux,jump_dx] = KS_detection(tt,xx,20,200,5);
+% jumpsx = KS_detection(tt,xx,20,200,5);
 % 
 % % Plot the data and the jumps:
+% jump_ux = jumpsx(jumpsx(:,2)==1);
+% jump_dx = jumpsx(jumpsx(:,2)==-1);
 % figure; plot(tt,xx,'k'); hold on; vline(jump_ux,'r'); vline(jump_dx,'b');
 
 %% Default values
@@ -52,7 +53,7 @@ n_w = 10;
 d_c = 0.75;
 n_c = 3;
 s_c = 1.5;
-x_c = std(x)*0.15 + (max(x)-min(x))*0.03;
+x_c = std(x)*0.1 + (max(x)-min(x))*0.04; % std(x)*0.15 + (max(x)-min(x))*0.03;
 
 try
     n_w = varargin{1};
@@ -64,20 +65,22 @@ end
 
 %% Preprocessing the time series
 
-data(:,1) = t;
-data(:,2) = x;
-
-% For dates that are equal find the mean value of x
-[C,~,idx] = unique(data(:,1),'stable');
-val = accumarray(idx,data(:,2),[],@mean);
-data1 = [C val];  clearvars C ia idx val 
+% Make sure t and x are column vectors
+if isrow(t)
+    t = t';
+end
+if isrow(x)
+    x = x';
+end
 
 % Delete NaN rows
-data1(isnan(data1(:,1)),:) = [];
-data1(isnan(data1(:,2)),:) = [];
+idx = ~isnan(t+x);
+t = t(idx);
+x = x(idx);
 
-tt = data1(:,1);
-xx = data1(:,2);
+% For dates that are equal find the mean value of x
+[tt,~,idx] = unique(t,'stable');
+xx = accumarray(idx,x,[],@mean);
 
 % Make sure all values have the same sign
 if sign(max(xx))>sign(min(xx))
@@ -86,12 +89,12 @@ end
 
 %% Varying window size
 
-if or(min_w == max_w , n_w==1)   % in case there is only one n_w window size
-    kswindow = min_w;
+if or(w_min == w_max , n_w==1)   % in case there is only one n_w window size
+    kswindow = w_min;
     n_w = 1;
 else
     for i=1:n_w
-        kswindow(i)=min_w*(max_w/min_w)^((i-1)/(n_w-1));   % makes n_w window sizes
+        kswindow(i)=w_min*(w_max/w_min)^((i-1)/(n_w-1));   % makes n_w window sizes
     end
 end
 
@@ -117,11 +120,11 @@ for j = 1:n_w
         changes(i)=mean(xx(r1))-mean(xx(r2));
         len1(i)=length(xx(r1)); 
         len2(i)=length(xx(r2));
-        std1(i)=std(xx(r1)); 
+        std1(i)=std(xx(r1));
         std2(i)=std(xx(r2));
     end
     
-    ksstat(:,j)=cc.*sign(changes);     % KS statistic (D_KS)+ sign
+    ksstat(:,j)=cc.*sign(changes);  % KS statistic (D_KS) + sign
     change_ks(:,j)=changes;         % difference between the two samples
     kslen1(:,j)=len1;               % size of sample1
     kslen2(:,j)=len2;               % size of sample2
@@ -131,29 +134,33 @@ end
 
 %% Find the jumps
 
+clearvars -except kswindow tt xx n_w ksstat change_ks kslen1 kslen2 ksstd1 ksstd2 d_c n_c s_c x_c
+
+% Scale D_KS by mean D_KS of smaller windows
+ksstat2 = ksstat;
+if size(ksstat,2)>2
+    for i=size(ksstat,2):-1:3
+        ksstat2(:,i)= nanmean([ksstat(:,i)';ksstat(:,i)';nanmean(ksstat(:,1:i-1)')])';
+    end
+    ksstat2(:,2)=nanmean([ksstat(:,2)';ksstat(:,2)';ksstat(:,1)';])';
+end
+
 % Apply d_c, n_c, s_c, x_c threshold parameters
-clearvars -except kswindow data1 tt xx n_w ksstat change_ks kslen1 kslen2 ksstd1 ksstd2 d_c n_c s_c x_c
 th_si = kslen1>=n_c & kslen2>=n_c;	% sample size threshold
 th_st = s_c*ksstd1<=abs(change_ks) & s_c*ksstd2<=abs(change_ks);  % sample std threshold
 th_change = x_c<=abs(change_ks); 
-ksstat2 = 1-(1-abs(ksstat))./(1-((kslen1+kslen2)./(kslen1.*kslen2)).^0.5); 
-ksstat2(ksstat2 < 0)=0; 
+ksstat2 = 1-(1-abs(ksstat2))./(1-((kslen1+kslen2)./(kslen1.*kslen2)).^0.5);
+ksstat2(abs(ksstat)==1) = 1;
+ksstat2(ksstat2 < 0) = 0;
 ksstat2 = ksstat2.*sign(change_ks); 
-ksstat2([1,end-1],:)=0;
+ksstat2(th_si==0) = 0;
+ksstat2([1,end-1],:) = 0;
 th_ks = abs(ksstat2)>=d_c;
 ks_all = ksstat2.*th_st.*th_si.*th_change.*th_ks;
 
-% Scale by mean D_KS of smaller windows
-if length(ks_all(1,:))>2
-    for i=length(ks_all(1,:)):-1:3
-        ks_all(:,i)=ks_all(:,i).*0.67+mean(ksstat2(:,1:i-1)')'.*0.33;
-    end
-    ks_all(:,2)=ks_all(:,2).*0.67+ksstat2(:,1).*0.33;
-end
-
 % Append mean of all windows
 ksstat_m=ksstat; 
-if length(ks_all(1,:))>1
+if size(ks_all,2)>1
     ksstat_m(:,end+1) = mean(ksstat_m')';
     ksstat2(:,end+1) = mean(ksstat2')';
     ks_all(:,end+1) = mean(ks_all')';
@@ -161,9 +168,9 @@ if length(ks_all(1,:))>1
 end
 
 % Find D_KS peaks
-for j=1:length(ksstat2(1,:))
+for j=1:size(ksstat2,2)
     k=1; kk=1;                                           % k = index of sign changes, kk = index of peaks
-    for i=2:length(ksstat2(:,1))
+    for i=2:size(ksstat2,1)
         if sign(ksstat_m(i-1,j)) ~= sign(ksstat_m(i,j))          % check if sign of ks_all changes
             if any(ks_all(k:i-1,j) ~= 0) && any(~isnan(ks_all(k:i-1,j)))
                 mmm=ks_all(k:i-1,j); 
@@ -178,39 +185,65 @@ for j=1:length(ksstat2(1,:))
         end
     end
 end
+
+if ~exist('ks_peak','var')   % Function will end here if no jumps have been found
+    jumps = [NaN,NaN];      % Output
+    return
+end
+
 peak_up=ks_peak;
 peak_do=ks_peak;
 for i=1:length(ks_peak)
-    peak_up{i}(peak_up{i}(:,2)<0,:)=[];  % Split ks_peak into positive and negative
-    peak_do{i}(peak_do{i}(:,2)>0,:)=[];  % Split ks_peak into positive and negative
+    if ~isempty(peak_up{i})
+        peak_up{i}(peak_up{i}(:,2)<0,:)=[];  % Split ks_peak into positive and negative
+    end
+    if ~isempty(peak_do{i})
+        peak_do{i}(peak_do{i}(:,2)>0,:)=[];  % Split ks_peak into positive and negative
+    end
 end
 
 % delete jumps found with smaller windows that correspond to those found with larger windows
-jump_u=(tt(peak_up{length(ks_all(1,:))}(:,1))+tt(peak_up{length(ks_all(1,:))}(:,1)+1))/2;  % use middle date between sample1 and sample2 as the transition date 
-jump_d=(tt(peak_do{length(ks_all(1,:))}(:,1))+tt(peak_do{length(ks_all(1,:))}(:,1)+1))/2;
-if length(ks_all(1,:))>1
-    for j=length(ks_all(1,:))-1:-1:1
+jump_u = [];
+jump_d = [];
+if ~isempty(peak_up{end})
+    jump_u=(tt(peak_up{end}(:,1))+tt(peak_up{end}(:,1)+1))/2;  % use middle date between sample1 and sample2 as the transition date
+end
+if ~isempty(peak_do{end})
+    jump_d=(tt(peak_do{end}(:,1))+tt(peak_do{end}(:,1)+1))/2;  % use middle date between sample1 and sample2 as the transition date
+end
+if size(ks_peak,2)>1
+    for j=size(ks_peak,2)-1:-1:1
         if ~isempty(peak_up{j})
-            xxx_u=(tt(peak_up{j}(:,1))+tt(peak_up{j}(:,1)+1))/2;
+            xxx_u=(tt(peak_up{j}(:,1))+tt(peak_up{j}(:,1)+1))/2;  % use middle date between sample1 and sample2 as the transition date
         else
             xxx_u=[];
         end
         if ~isempty(peak_do{j})
-            xxx_d=(tt(peak_do{j}(:,1))+tt(peak_do{j}(:,1)+1))/2;
+            xxx_d=(tt(peak_do{j}(:,1))+tt(peak_do{j}(:,1)+1))/2;  % use middle date between sample1 and sample2 as the transition date
         else
             xxx_d=[];
         end
         for i=1:length(jump_u)
-            xxx_u(xxx_u<jump_u(i)+kswindow(j) & xxx_u>jump_u(i)-kswindow(j))=[];   % delete peaks that are close to those found with larger windows
+            xxx_u(xxx_u<jump_u(i)+kswindow(j) & xxx_u>jump_u(i)-kswindow(j))=[];  % delete peaks that are close to those found with larger windows
         end
         for i=1:length(jump_d)
-            xxx_d(xxx_d<jump_d(i)+kswindow(j) & xxx_d>jump_d(i)-kswindow(j))=[];
+            xxx_d(xxx_d<jump_d(i)+kswindow(j) & xxx_d>jump_d(i)-kswindow(j))=[];  % delete peaks that are close to those found with larger windows
         end
         jump_u=[jump_u; xxx_u];
         jump_d=[jump_d; xxx_d];
     end
 end
-jump_u=sort(jump_u);
-jump_d=sort(jump_d);
+
+if ~isempty(jump_u)
+    jump_u(:,2) = 1;
+end
+if ~isempty(jump_d)
+    jump_d(:,2) = -1;
+end
+jumps = sortrows([jump_u;jump_d]);  % Output
+
+if isempty(jumps)
+    jumps = [NaN,NaN];              % Output if no jumps were found
+end
 
 end
