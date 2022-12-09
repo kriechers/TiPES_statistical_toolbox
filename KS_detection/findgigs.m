@@ -13,7 +13,7 @@ function [G_I,G_S] = findgigs(year,proxy,window)
 intxx=min(year):(max(year)-min(year))/(length(year)-1):max(year);
 intyy=interp1(year,proxy,intxx);
 for i = 1:length(intxx)
-    r1=find(intxx >= intxx(i)-window/2 & intxx < intxx(i)+window/2);	% window around
+    r1=intxx >= intxx(i)-window/2 & intxx < intxx(i)+window/2;	% window around
     xxx=intyy(r1);
     Gii(i) = quantile(xxx(xxx >= mean(xxx)),0.75); 
     Gss(i) = quantile(xxx(xxx <= mean(xxx)),0.25); 
