@@ -38,7 +38,7 @@ x = accumarray(idx,x,[],@mean);
 % % Data options
 t1=t; x1=x;                 % these will be used to plot the unaltered data
 % x = log10(x); logdata = 1;  % logarithmic scale
- x = -x; updown = 1;         % flip upside down
+% x = -x; updown = 1;         % flip upside down
 
 %% Plotting options
 
@@ -60,11 +60,9 @@ w_max = 2.5;
 n_w   = 12;
 d_c   = 0.77;
 n_c   = 3;
-s_c   = 2.2;
-x_c   = 0.8;
 
 % % Run KS_detection
-jumps = KS_detection(t,x,w_min,w_max,n_w,d_c,n_c,s_c,x_c);
+jumps = KS_detection(t,x,w_min,w_max,n_w,d_c,n_c);
 
 %% Find "stadial - interstadial" boundaries (optional, may take a long time)
 
