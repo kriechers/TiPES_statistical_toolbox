@@ -53,7 +53,7 @@ n_w = 10;
 d_c = 0.75;
 n_c = 3;
 s_c = 1.5;
-x_c = std(x)*0.1 + (max(x)-min(x))*0.04; % std(x)*0.15 + (max(x)-min(x))*0.03;
+x_c = std(x)*0.1 + (max(x)-min(x))*0.04;
 
 try
     n_w = varargin{1};
