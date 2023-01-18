@@ -1,4 +1,4 @@
-function [jumps] = KS_detection(t,x,w_min,w_max,varargin) 
+function [jumps] = KS_detection4(t,x,w_min,w_max,varargin) 
 %% DESCRIPTION
 % The KS_detection function detects abrupt transitions (jumps) in climate
 % proxy records using an augmented Kolmogorov–Smirnov (KS) test. This
@@ -8,7 +8,7 @@ function [jumps] = KS_detection(t,x,w_min,w_max,varargin)
 % https://doi.org/10.1063/5.0062543
 %
 % Author: Witold Bagniewski
-% Date: 29/11/2022 
+% Date: 17/01/2023
 %
 %% USAGE 
 % Syntax
@@ -49,11 +49,11 @@ function [jumps] = KS_detection(t,x,w_min,w_max,varargin)
 
 %% Default values
 
-n_w = 10;
+n_w = 15;
 d_c = 0.75;
 n_c = 3;
 s_c = 1.5;
-x_c = std(x)*0.1 + (max(x)-min(x))*0.04;
+x_c = std(x)*0.1 + (max(x)-min(x))*0.05;
 
 try
     n_w = varargin{1};
@@ -140,9 +140,9 @@ clearvars -except kswindow tt xx n_w ksstat change_ks kslen1 kslen2 ksstd1 ksstd
 ksstat2 = ksstat;
 if size(ksstat,2)>2
     for i=size(ksstat,2):-1:3
-        ksstat2(:,i)= nanmean([ksstat(:,i)';ksstat(:,i)';nanmean(ksstat(:,1:i-1)')])';
+        ksstat2(:,i)= nanmean([ksstat(:,i)';nanmean(ksstat(:,1:i-1)')])';
     end
-    ksstat2(:,2)=nanmean([ksstat(:,2)';ksstat(:,2)';ksstat(:,1)';])';
+    ksstat2(:,2)=nanmean([ksstat(:,2)';ksstat(:,1)';])';
 end
 
 % Apply d_c, n_c, s_c, x_c threshold parameters
@@ -171,12 +171,12 @@ end
 for j=1:size(ksstat2,2)
     k=1; kk=1;                                           % k = index of sign changes, kk = index of peaks
     for i=2:size(ksstat2,1)
-        if sign(ksstat_m(i-1,j)) ~= sign(ksstat_m(i,j))          % check if sign of ks_all changes
+        if sign(ksstat_m(i-1,j)) ~= sign(ksstat_m(i,j))          % check if sign of ksstat changes
             if any(ks_all(k:i-1,j) ~= 0) && any(~isnan(ks_all(k:i-1,j)))
                 mmm=ks_all(k:i-1,j); 
-                [~,I] = max(abs(mmm));                   % maximum of ks_all2
+                [~,I] = max(abs(mmm));                   % maximum of ks_all
                 iii=find(mmm==mmm(I))+k-1;  
-                [~,II] = max(abs(sum(ksstat2(iii,:)')));  % maximum of ks_all, in case ks_all2 are equal
+                [~,II] = max(abs(sum(ksstat2(iii,:)')));  % maximum of ksstat2, in case ks_all are equal
                 ks_peak{j}(kk,2)=ks_all(iii(II(end)),j);
                 ks_peak{j}(kk,1)=iii(II(end));
                 kk=kk+1;

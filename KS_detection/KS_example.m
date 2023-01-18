@@ -5,18 +5,18 @@
 % as a pdf file. Dates of the transitions are saved to a csv file.
 %
 % Author: Witold Bagniewski
-% Date: 29/11/2022
+% Date: 18/01/2023
 %
 %% Load data
 
 Fname = 'NGRIP';  ext = '.csv';
 data = readcell([Fname ext], 'CommentStyle', '#');
-data(cellfun(@(x) isa(x,'missing'), data)) = {nan};  % Replace empty cells with NaNs
+data = cell2table(data(2:end,:), 'VariableNames', data(1,:));
 Vname = 'd18O';  % Variable name used for saving the figure
 t_column = 1;    % Column containing time
 x_column = 2;    % Column containing variable
-t = cell2mat(data(2:end,t_column));   % this assumes the first row contains variable names
-x = cell2mat(data(2:end,x_column));
+t = table2array(data(:,t_column));   % this assumes the first row contains variable names
+x = table2array(data(:,x_column));
 
 % % Load .txt file
 % Fname = 'ngrip_d18o_20y';  ext = '.txt'; 
@@ -47,8 +47,8 @@ xtck = 0:2:5000;                  % x ticks
 xtck_m = 0:0.2:5000;              % small x ticks
 t_lim = [min(t1),max(t1)];        % Plot the entire time series
 %t_lim = [7.8,122.3];              % Plot only part of the time series
-x_label = char(data(1,t_column)); % Set time label
-y_label = char(data(1,x_column)); % Set variable label
+x_label = char(data.Properties.VariableNames(t_column)); % Set time label
+y_label = char(data.Properties.VariableNames(x_column)); % Set variable label
 % x_label = 'Age [kyr b2k]';       % Use a custom time label
 % y_label = '\delta^{18}O [‰]';   % Use a custom variable label
 
@@ -57,12 +57,14 @@ y_label = char(data(1,x_column)); % Set variable label
 % % KS_detection parameters
 w_min = 0.12;
 w_max = 2.5;
-n_w   = 12;
+n_w   = 15;
 d_c   = 0.77;
 n_c   = 3;
+s_c   = 2;
+x_c   = 0.8;
 
 % % Run KS_detection
-jumps = KS_detection(t,x,w_min,w_max,n_w,d_c,n_c);
+jumps = KS_detection(t,x,w_min,w_max,n_w,d_c,n_c,s_c,x_c);
 
 %% Find "stadial - interstadial" boundaries (optional, may take a long time)
 
@@ -147,6 +149,7 @@ xlim(xl1); ylim(yl);
 if exist('updown','var') && updown==1; axis ij; end
 xticks(xtck); ylabel(y_label); set(gca,'layer','top');
 hA=gca; hA.XAxis.MinorTick = 'on'; hA.XAxis.MinorTickValues = xtck_m;
+if exist('logdata','var') && logdata == 1 && length(yticks)==1; hA.YAxis.TickValues = [hA.YAxis.TickValues/5 hA.YAxis.TickValues hA.YAxis.TickValues*5]; end
 title(Fname,'FontWeight','Normal','Interpreter','none');
 set(gca,'FontSize',11)
 
@@ -170,6 +173,7 @@ xlim(xl2); ylim(yl);
 if exist('updown','var') && updown==1; axis ij; end
 xticks(xtck); ylabel(y_label); set(gca,'layer','top');
 hA=gca; hA.XAxis.MinorTick = 'on'; hA.XAxis.MinorTickValues = xtck_m;
+if exist('logdata','var') && logdata == 1 && length(yticks)==1; hA.YAxis.TickValues = [hA.YAxis.TickValues/5 hA.YAxis.TickValues hA.YAxis.TickValues*5]; end
 set(gca,'FontSize',11)
 
 subaxis(3,1,1,3)
@@ -192,6 +196,7 @@ xlim(xl3); ylim(yl);
 if exist('updown','var') && updown==1; axis ij; end
 xticks(xtck); ylabel(y_label); xlabel(x_label); set(gca,'layer','top');
 hA=gca; hA.XAxis.MinorTick = 'on'; hA.XAxis.MinorTickValues = xtck_m;
+if exist('logdata','var') && logdata == 1 && length(yticks)==1; hA.YAxis.TickValues = [hA.YAxis.TickValues/5 hA.YAxis.TickValues hA.YAxis.TickValues*5]; end
 set(gca,'FontSize',11)
 
 set(gcf,'PaperUnits','inches','PaperPosition',[-0.05 0 8.2 11.5])

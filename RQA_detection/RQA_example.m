@@ -9,18 +9,18 @@
 % https://doi.org/10.1063/5.0062543
 %
 % Author: Witold Bagniewski 
-% Date: 09/12/2022
+% Date: 18/01/2023
 %
 %% Load data
 
 Fname = 'NGRIP';  ext = '.csv';
 data = readcell([Fname ext], 'CommentStyle', '#');
-data(cellfun(@(x) isa(x,'missing'), data)) = {nan};  % Replace empty cells with NaNs
+data = cell2table(data(2:end,:), 'VariableNames', data(1,:));
 Vname = 'd18O';  % Variable name used for saving the figure
 t_column = 1;    % Column containing time
 x_column = 2;    % Column containing variable
-t = cell2mat(data(2:end,t_column));   % this assumes the first row contains variable names
-x = cell2mat(data(2:end,x_column));
+t = table2array(data(:,t_column));   % this assumes the first row contains variable names
+x = table2array(data(:,x_column));
 
 % % Load .txt file
 % Fname = 'ngrip_d18o_20y';  ext = '.txt'; 
@@ -47,8 +47,8 @@ w_max = 1;  % Size of the largest window
 n_w = 1;    % Number of distinct window lengths
 
 % updown = 1;    % plot the timeseries upside down
-x_label = char(data(1,t_column)); % Set time label
-y_label = char(data(1,x_column)); % Set variable label
+x_label = char(data.Properties.VariableNames(t_column)); % Set time label
+y_label = char(data.Properties.VariableNames(x_column)); % Set variable label
 
 % % Plot part of the time series
 % t_lim = [0,250]; 
@@ -145,7 +145,7 @@ line(t,x,'LineWidth',0.5,'Color',[0 0 0])
 h(1).XRuler.TickLabelGapOffset = -1;
 ylabel(y_label);
 title(Fname,'FontWeight','Normal','Interpreter','none');
-set(gca,'FontSize',11)
+set(gca,'FontSize',10)
 if exist('updown') && updown==1; axis ij; end
 
 % Recurrence plot.
@@ -170,6 +170,7 @@ axes('Position',[0.055 0.049 0.9 0.9],...
 ylabel(x_label);
 axis square xy
 colormap([1 1 1; 0 0 0])
+set(gca,'FontSize',10)
 
 % RQA - Recurrence rate.
 h(3) = axes('Position',[0.055 0.019 0.9 0.16],...
@@ -183,10 +184,10 @@ line(h(3),t,RR,'LineWidth',1,'Color',[0 0.5 0.75])
 h(3).XRuler.TickLabelGapOffset = -1;
 hold on; scatter(t(pks),RR(pks),50,'x','m','LineWidth',1)
 xlabel(x_label); ylabel('Recurrence rate');
-set(gca,'FontSize',11)
+set(gca,'FontSize',10)
 
 % Print.
-printname = [Fname '_' Vname '_RR.pdf']; 
+printname = [Fname '_' Vname '_RQA.pdf']; 
 print(printname,'-dpdf', '-fillpage');
 
 %% Save RQAjumps dates
