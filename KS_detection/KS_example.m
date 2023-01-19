@@ -5,7 +5,7 @@
 % as a pdf file. Dates of the transitions are saved to a csv file.
 %
 % Author: Witold Bagniewski
-% Date: 18/01/2023
+% Date: 19/01/2023
 %
 %% Load data
 
@@ -34,6 +34,19 @@ x = x(idx);
 % % For dates that are equal find the mean value of x
 [t,~,idx] = unique(t,'stable');
 x = accumarray(idx,x,[],@mean);
+
+% % Resample the timeseries
+% s_rate = 0.02;                 % set the new sampling rate
+% i=1;
+% for y = 0:s_rate:t(end)+s_rate
+%     r1=find(t > y-s_rate/2 & t <= y+s_rate/2);
+%     d2(i,1)=y;
+%     d2(i,2)=mean(x(r1));
+%     i=i+1;
+% end
+% d2(isnan(d2(:,1)),:) = [];	 % delete NaN rows
+% d2(isnan(d2(:,2)),:) = [];	 % delete NaN rows
+% t=d2(:,1); x=d2(:,2);
 
 % % Data options
 t1=t; x1=x;                 % these will be used to plot the unaltered data
@@ -204,6 +217,11 @@ print('-dpdf','-painters',[Fname '_' Vname '_KS'])
 
 %% Save KSjumps dates
 
+jumpjump = jumps;
+if exist('updown','var') && updown==1
+    jumpjump(:,2)=jumpjump(:,2)*-1;   % this will restore the direction of the jumps (as before the Y axis was reversed)
+end
+
 clear par_n
 if exist('w_min','var'); par_n{1} = ['w_min = ' num2str(w_min)]; end
 if exist('w_max','var'); par_n{end+1} = [', w_max = ' num2str(w_max)]; end
@@ -217,5 +235,5 @@ fileID = fopen([Fname '_' Vname '_KSjumps.csv'],'w');
 fprintf(fileID,'%s\n',['# KS test parameters: ' strcat(par_n{:})]);
 fprintf(fileID,'# The sign of a jump indicates direction: 1 = up, -1 = down, e.g. abrupt warming vs. abrupt cooling\n\n');
 fprintf(fileID,'time,jump\n');
-fprintf(fileID,'%g,%g\n',jumps');
+fprintf(fileID,'%g,%g\n',jumpjump');
 fclose(fileID);
