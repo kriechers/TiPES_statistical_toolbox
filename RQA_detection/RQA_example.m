@@ -2,14 +2,14 @@
 % MATLAB script to perform Recurrence Quantification Analysis (RQA) on the
 % NGRIP d18O record (Rasmussen et al., 2014). This script calculates the
 % recurrence matrix and the recurrence rate, and finds the most prominent
-% RR peaks. The results are plotted and saved as a pdf file. This script
-% creates Figure 8 of the paper:
-% Bagniewski, W., Ghil, M., Rousseau, D.-D., (2021) Automatic detection of
-% abrupt transitions in paleoclimate records. Chaos, 31(11):113129,
-% https://doi.org/10.1063/5.0062543
+% RR peaks. The results are plotted and saved as a pdf file. Dates of the
+% main change points are saved to a csv file. This script creates Figure 8
+% of the paper: Bagniewski, W., Ghil, M., Rousseau, D.-D., (2021) Automatic
+% detection of abrupt transitions in paleoclimate records. Chaos,
+% 31(11):113129, https://doi.org/10.1063/5.0062543
 %
 % Author: Witold Bagniewski 
-% Date: 18/01/2023
+% Date: 09/03/2023
 %
 %% Load data
 
@@ -36,8 +36,8 @@ t = t(idx);
 x = x(idx);
 
 % For dates that are equal find the mean value of x
-[tt,~,idx] = unique(t,'stable');
-xx = accumarray(idx,x,[],@mean);
+[t,~,idx] = unique(t,'stable');
+x = accumarray(idx,x,[],@mean);
 
 %% Parameters for RQA and for plotting
 
@@ -201,5 +201,5 @@ if exist('epsl','var'); par_n{end+1} = [', epsilon = ' num2str(epsl)]; end
 fileID = fopen([Fname '_' Vname '_RQAjumps.csv'],'w');
 fprintf(fileID,'%s\n\n',['# RQA parameters: ' strcat(par_n{:})]);
 fprintf(fileID,'time,RR prominence\n');
-fprintf(fileID,'%g,%g\n',[t(pks),p]');
+fprintf(fileID,'%g,%g\n',[reshape(t(pks),[],1),p]');
 fclose(fileID);
