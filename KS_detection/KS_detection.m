@@ -30,6 +30,22 @@ function [jumps] = KS_detection4(t,x,w_min,w_max,varargin)
 % Output:
 % jumps : Dates of jumps. Right column indicates direction: 1 = "up", -1 = "down", e.g. abrupt warming vs. abrupt cooling
 %
+% Choosing optimal parameter values:
+% The selection of optimal parameter values may vary depending on the
+% characteristics of the time series, such as resolution, noise level and
+% the abruptness of transitions, as well as on the time scale investigated
+% and the desired sensitivity of the test. For further details, see
+% Bagniewski et al., 2021 Chaos. The default values should work reasonably
+% well for most time series that exhibit abrupt changes. Only w_min and
+% w_max are mandatory for input; other parameters, if not defined, are set
+% to default values.
+% w_min, w_max : If investigating centennial to millennial scale variability, ~0.1 kyr for w_min and ~5 kyr for w_max should work well.
+% n_w   	   : Higer is generally better, but takes more time to run
+% d_c  	       : For most use cases, keep between 0.6 and 0.9
+% n_c  	       : Integer, not lower than 2
+% s_c  	       : For most use cases, keep between 1 and 3
+% x_c  	       : Either leave it at default or set it to a value corresponding to the minimum amplitude of transitions deemed significant
+%
 %% EXAMPLE
 % % Generate some data:
 % tt=1:5000;
